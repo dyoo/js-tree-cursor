@@ -52,7 +52,38 @@ describe('tests',
 
 
 
+             'array successor' : function() {
+                 var path = TreePath.arrayToPath([[1, 2, [3, 4], [5, [[[6]]]], 7]]);
+                 value_of(path.canSucc()).should_be(true);
 
+                 value_of(path.succ().succ().node).should_be(1);
+                 value_of(path.succ().succ().succ().node).should_be(2);
+                 value_of(path.succ().succ().succ().succ().succ().node).should_be(3);
+                 value_of(path.succ().succ().succ().succ().succ().succ().node).should_be(4);
+                 value_of(path.succ().succ().succ().succ().succ().succ().succ().succ().node).should_be(5);
+                 value_of(path.succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().node).should_be(6);
+                 value_of(path.succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().node).should_be(7);
+
+                 value_of(path.succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().canSucc()).should_be(false);
+                 value_of(path.succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().canSucc()).should_be(true);
+             },
+
+
+             'array predecessor' : function() {
+                 var path = TreePath.arrayToPath([[1, 2, [3, 4], [5, [[[6]]]], 7]]);
+                 var rightMost = path.succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ().succ();
+                 value_of(rightMost.node).should_be(7);
+                 value_of(rightMost.pred().node).should_be(6);
+                 value_of(rightMost.pred().pred().pred().pred().pred().node).should_be(5);
+                 value_of(rightMost.pred().pred().pred().pred().pred().pred().pred().node).should_be(4);
+                 value_of(rightMost.pred().pred().pred().pred().pred().pred().pred().pred().node).should_be(3);
+                 value_of(rightMost.pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().node).should_be(2);
+                 value_of(rightMost.pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().node).should_be(1);
+                 
+                 value_of(rightMost.pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().canPred()).should_be(true);
+                 value_of(rightMost.pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().canPred()).should_be(true);
+                 value_of(rightMost.pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().pred().canPred()).should_be(false);
+             }
 
 
 

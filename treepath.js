@@ -24,6 +24,10 @@ var TreePath = (function() {
         this.closeF = closeF;
     };
 
+    TreePath.prototype.canDown = function() {
+        var opened = this.openF(this.node);
+        return (opened.length !== 0);
+    };
 
     TreePath.prototype.down = function() {
         var opened = this.openF(this.node);
@@ -48,6 +52,10 @@ var TreePath = (function() {
     };
 
 
+    TreePath.prototype.canUp = function() {
+        return this.parent !== undefined;
+    };
+
     TreePath.prototype.up = function() {
         var parent = this.parent;
         return new TreePath(parent.parent,
@@ -59,6 +67,8 @@ var TreePath = (function() {
                             this.closeF);
     };
 
+    TreePath.prototype.canLeft = function() { return this.prevs.length !== 0; };
+
     TreePath.prototype.left = function() {
         if (this.prevs.length === 0) { throw new Error("left of first"); }
         return new TreePath(this.parent,
@@ -69,6 +79,8 @@ var TreePath = (function() {
                             this.closeF);
     };
 
+    TreePath.prototype.canRight = function() { return this.nexts.length !== 0; };
+
     TreePath.prototype.right = function() {
         if (this.nexts.length === 0) { throw new Error("right of last"); }
         return new TreePath(this.parent,
@@ -78,7 +90,90 @@ var TreePath = (function() {
                             this.openF, 
                             this.closeF);
     };
-  
+    
+    TreePath.prototype.succ = function() {
+        var n;
+        if (this.canDown()) {
+            return this.down();
+        } else if (this.canRight()) {
+            return this.right();
+        } else {
+            n = this;
+            while (true) {
+                n = n.up();
+                if (n.canRight()) {
+                    return n.right();
+                }
+            }
+        }
+    };
+ 
+    TreePath.prototype.pred = function() {
+        var n;
+        if (this.canLeft()) {
+            n = this.left();
+            while (n.canDown()) {
+                n = n.down();
+                while (n.canRight()) {
+                    n = n.right();
+                }
+            }
+            return n;
+        } else {
+            return this.up();
+        }
+    };
+
+    TreePath.prototype.canPred = function() {
+        return this.canLeft() || this.canUp();
+    };
+
+    TreePath.prototype.canSucc = function() {
+        var n;
+        if (this.canDown()) {
+            return true;
+        } else if (this.canRight()) {
+            return true;
+        } else {
+            n = this;
+            while (true) {
+                if (! n.canUp()) { return false; }
+                n = n.up();
+                if (n.canRight()) {
+                    return true;
+                }
+            }
+        }
+    };
+
+
+
+
+
+
+    TreePath.arrayToPath = function(anArray) {
+        var arrayOpenF = function(n) { 
+            if (n.hasOwnProperty("length")) { 
+                return n;
+            } else {
+                return [];
+            }
+        };
+        var arrayCloseF = function(n, children) { 
+            if (n.hasOwnProperty("length")) {
+                return children;
+            } else {
+                return n;
+            }
+        };
+        return new TreePath(undefined,
+                            anArray,
+                            [],
+                            [],
+                            arrayOpenF,
+                            arrayCloseF);
+    };
+
 
     TreePath.domToPath = function(dom) {
         var domOpenF = 
