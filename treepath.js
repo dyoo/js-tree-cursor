@@ -1,8 +1,15 @@
+/*jslint vars: true, white: true, plusplus: true, maxerr: 50, indent: 4 */
+
+
+
+// Offers functional views, traversals of the DOM.
+// See Functional Pearl: The Zipper, by G\'erard Huet
+// J. Functional Programming 7 (5): 549--554 Sepember 1997
+
+
 var TreePath = (function() {
     "use strict";
 
-    // See Functional Pearl: The Zipper, by G\'erard Huet
-    // J. Functional Programming 7 (5): 549--554 Sepember 1997
     var TreePath = function(parent, node, prevs, nexts, openF, closeF) {
         this.parent = parent; // Parent can be the top (undefined), or a TreePath
         this.node = node;
@@ -49,7 +56,7 @@ var TreePath = (function() {
                             parent.prevs,
                             parent.nexts,
                             this.openF,
-                            this.closeF)
+                            this.closeF);
     };
 
     TreePath.prototype.left = function() {
@@ -77,17 +84,20 @@ var TreePath = (function() {
         var domOpenF = 
             // To go down, just take the children.
             function(n) { 
-                return [].slice.call(n.children, 0);
+                return [].slice.call(n.childNodes, 0);
             };
         var domCloseF = 
             // To go back up, take the node, do a shallow cloning, and replace the children.
             function(node, children) { 
+                var i;
                 var newNode = node.cloneNode(false);
-                newNode.children = children;
+                for (i = 0; i < children.length; i++) {
+                    newNode.appendChild(children[i].cloneNode(true));
+                }
                 return newNode; 
             };
         return new TreePath(undefined,
-                            dom,
+                            dom.cloneNode(true),
                             [],
                             [],
                             domOpenF,
