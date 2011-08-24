@@ -1,0 +1,16 @@
+A Zipper data structure for JavaScript DOM trees and other tree-like
+structures.
+
+Danny Yoo (dyoo@hashcollision.org)
+
+
+This library provides a functional interface to trees, using G\'erard
+Huet's Zipper data structure.  See: http://en.wikipedia.org/wiki/Zipper_(data_structure)
+
+
+Usage:
+
+You can traverse the DOM functionally with this:
+
+
+       var cursor = TreeCursor.domToCursor($('<div>Hello world</div>').get(0));

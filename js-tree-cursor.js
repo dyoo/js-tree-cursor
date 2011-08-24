@@ -151,7 +151,7 @@ var TreeCursor = (function() {
 
 
 
-    TreeCursor.arrayToPath = function(anArray) {
+    TreeCursor.arrayToCursor = function(anArray) {
         var arrayOpenF = function(n) { 
             if (n.hasOwnProperty("length")) { 
                 return n;
@@ -175,7 +175,7 @@ var TreeCursor = (function() {
     };
 
 
-    TreeCursor.domToPath = function(dom) {
+    TreeCursor.domToCursor = function(dom) {
         var domOpenF = 
             // To go down, just take the children.
             function(n) { 
