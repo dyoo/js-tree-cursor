@@ -19,7 +19,7 @@ var TreePath = (function() {
 
 
     TreePath.prototype.down = function() {
-        var opened = this.openF(node);
+        var opened = this.openF(this.node);
         if (opened.length === 0) {
             throw new Error("down of empty");
         }
@@ -74,20 +74,27 @@ var TreePath = (function() {
   
 
     TreePath.domToPath = function(dom) {
+        var domOpenF = 
+            // To go down, just take the children.
+            function(n) { 
+                console.log('openF', n);
+                return n.children; 
+            };
+        var domCloseF = 
+            // To go back up, take the node, do a shallow cloning, and replace the children.
+            function(node, children) { 
+                console.log("closeF");
+                var newNode = node.cloneNode(false);
+                newNode.children = children;
+                return newNode; 
+            };
+        console.log('dom: ', dom);
         return new TreePath(undefined,
                             dom,
                             [],
                             [],
-                            // To go down, just take the children.
-                            function(n) { 
-                                return n.children 
-                            },
-                            
-                            // To go back up, take the node, do a shallow cloning, and replace the children.
-                            function(node, children) { var newNode = node.cloneNode(false);
-                                                       newNode.children = children;
-                                                       return newNode; }
-                           );
+                            domOpenF,
+                            domCloseF);
     };
 
     return TreePath;
