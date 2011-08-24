@@ -4,8 +4,9 @@ structures.
 Danny Yoo (dyoo@hashcollision.org)
 
 
-This library provides a functional interface to trees, using G\'erard
-Huet's Zipper data structure.  See: http://en.wikipedia.org/wiki/Zipper_(data_structure)
+This library provides a functional interface to traverse and
+manipulate trees, using G\'erard Huet's Zipper data structure.  See:
+http://en.wikipedia.org/wiki/Zipper_(data_structure)
 
 
 Usage:
@@ -77,3 +78,11 @@ Creates a cursor that can traverse the structure of the given node.
 openF and closeF are functions that teach the cursor how to sink and
 rise through the structure of a node.
 
+As an example, the TreeCursor implementation has a function
+TreeCursor.arrayToCursor to walk deeply nested JavaScript structures,
+with arrays.  It does not dive into objects, though.
+
+
+----------------------------------------------------------------------
+
+Test cases are in tests.js, and are invoked by visiting index.html.
