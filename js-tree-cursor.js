@@ -2,16 +2,16 @@
 
 
 
-// Offers functional views, traversals of the DOM.
+// Offers functional views, traversals of the DOM and other tree-like structures.
 // See Functional Pearl: The Zipper, by G\'erard Huet
 // J. Functional Programming 7 (5): 549--554 Sepember 1997
 
 
-var TreePath = (function() {
+var TreeCursor = (function() {
     "use strict";
 
-    var TreePath = function(parent, node, prevs, nexts, openF, closeF) {
-        this.parent = parent; // Parent can be the top (undefined), or a TreePath
+    var TreeCursor = function(parent, node, prevs, nexts, openF, closeF) {
+        this.parent = parent; // Parent can be the top (undefined), or a TreeCursor
         this.node = node;
         this.prevs = prevs;
         this.nexts = nexts;
@@ -24,17 +24,17 @@ var TreePath = (function() {
         this.closeF = closeF;
     };
 
-    TreePath.prototype.canDown = function() {
+    TreeCursor.prototype.canDown = function() {
         var opened = this.openF(this.node);
         return (opened.length !== 0);
     };
 
-    TreePath.prototype.down = function() {
+    TreeCursor.prototype.down = function() {
         var opened = this.openF(this.node);
         if (opened.length === 0) {
             throw new Error("down of empty");
         }
-        return new TreePath(this, 
+        return new TreeCursor(this, 
                             opened[0],
                             [],
                             opened.slice(1),
@@ -42,8 +42,8 @@ var TreePath = (function() {
                             this.closeF);
     };
 
-    TreePath.prototype.updateNode = function(f) {
-        return new TreePath(this.parent,
+    TreeCursor.prototype.updateNode = function(f) {
+        return new TreeCursor(this.parent,
                             f(this.node),
                             this.prevs,
                             this.nexts,
@@ -52,13 +52,13 @@ var TreePath = (function() {
     };
 
 
-    TreePath.prototype.canUp = function() {
+    TreeCursor.prototype.canUp = function() {
         return this.parent !== undefined;
     };
 
-    TreePath.prototype.up = function() {
+    TreeCursor.prototype.up = function() {
         var parent = this.parent;
-        return new TreePath(parent.parent,
+        return new TreeCursor(parent.parent,
                             this.closeF(parent.node,
                                         this.prevs.concat([this.node]).concat(this.nexts)),
                             parent.prevs,
@@ -67,11 +67,11 @@ var TreePath = (function() {
                             this.closeF);
     };
 
-    TreePath.prototype.canLeft = function() { return this.prevs.length !== 0; };
+    TreeCursor.prototype.canLeft = function() { return this.prevs.length !== 0; };
 
-    TreePath.prototype.left = function() {
+    TreeCursor.prototype.left = function() {
         if (this.prevs.length === 0) { throw new Error("left of first"); }
-        return new TreePath(this.parent,
+        return new TreeCursor(this.parent,
                             this.prevs[this.prevs.length - 1],
                             this.prevs.slice(0, this.prevs.length - 1),
                             [this.node].concat(this.nexts),
@@ -79,11 +79,11 @@ var TreePath = (function() {
                             this.closeF);
     };
 
-    TreePath.prototype.canRight = function() { return this.nexts.length !== 0; };
+    TreeCursor.prototype.canRight = function() { return this.nexts.length !== 0; };
 
-    TreePath.prototype.right = function() {
+    TreeCursor.prototype.right = function() {
         if (this.nexts.length === 0) { throw new Error("right of last"); }
-        return new TreePath(this.parent,
+        return new TreeCursor(this.parent,
                             this.nexts[0],
                             this.prevs.concat([this.node]),
                             this.nexts.slice(1),
@@ -91,7 +91,7 @@ var TreePath = (function() {
                             this.closeF);
     };
     
-    TreePath.prototype.succ = function() {
+    TreeCursor.prototype.succ = function() {
         var n;
         if (this.canDown()) {
             return this.down();
@@ -108,7 +108,7 @@ var TreePath = (function() {
         }
     };
  
-    TreePath.prototype.pred = function() {
+    TreeCursor.prototype.pred = function() {
         var n;
         if (this.canLeft()) {
             n = this.left();
@@ -124,11 +124,11 @@ var TreePath = (function() {
         }
     };
 
-    TreePath.prototype.canPred = function() {
+    TreeCursor.prototype.canPred = function() {
         return this.canLeft() || this.canUp();
     };
 
-    TreePath.prototype.canSucc = function() {
+    TreeCursor.prototype.canSucc = function() {
         var n;
         if (this.canDown()) {
             return true;
@@ -151,7 +151,7 @@ var TreePath = (function() {
 
 
 
-    TreePath.arrayToPath = function(anArray) {
+    TreeCursor.arrayToPath = function(anArray) {
         var arrayOpenF = function(n) { 
             if (n.hasOwnProperty("length")) { 
                 return n;
@@ -166,7 +166,7 @@ var TreePath = (function() {
                 return n;
             }
         };
-        return new TreePath(undefined,
+        return new TreeCursor(undefined,
                             anArray,
                             [],
                             [],
@@ -175,7 +175,7 @@ var TreePath = (function() {
     };
 
 
-    TreePath.domToPath = function(dom) {
+    TreeCursor.domToPath = function(dom) {
         var domOpenF = 
             // To go down, just take the children.
             function(n) { 
@@ -191,7 +191,7 @@ var TreePath = (function() {
                 }
                 return newNode; 
             };
-        return new TreePath(undefined,
+        return new TreeCursor(undefined,
                             dom.cloneNode(true),
                             [],
                             [],
@@ -199,5 +199,5 @@ var TreePath = (function() {
                             domCloseF);
     };
 
-    return TreePath;
+    return TreeCursor;
 }());
