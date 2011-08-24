@@ -10,7 +10,36 @@ Huet's Zipper data structure.  See: http://en.wikipedia.org/wiki/Zipper_(data_st
 
 Usage:
 
-You can traverse the DOM functionally with this:
+You can create a cursor into the DOM with this:
+
+       var cursor = TreeCursor.domToCursor(document.body)
+
+The cursor implements the following functions:
+
+    cursor.down: -> cursor
+    Move the cursor down to the first child.
+
+    cursor.up: -> cursor
+    Move the cursor up to the parent.
+
+    cursor.left: -> cursor
+    Move the cursor to the previous sibling.
+
+    cursor.right: -> cursor
+    Move the cursor to the next sibling.
+
+    cursor.succ: -> cursor
+    Move the cursor to the successor.
+
+    cursor.pred: -> cursor
+    Move the cursor to the predecessor.
 
 
-       var cursor = TreeCursor.domToCursor($('<div>Hello world</div>').get(0));
+along with predicates to make sure the motion is legal:
+
+    cursor.canDown: -> boolean
+    cursor.canUp: -> boolean
+    cursor.canLeft: -> boolean
+    cursor.canRight: -> boolean
+    cursor.canSucc: -> boolean
+    cursor.canPred: -> boolean
