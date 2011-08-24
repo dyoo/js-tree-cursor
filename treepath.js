@@ -77,18 +77,15 @@ var TreePath = (function() {
         var domOpenF = 
             // To go down, just take the children.
             function(n) { 
-                console.log('openF', n);
-                return n.children; 
+                return [].slice.call(n.children, 0);
             };
         var domCloseF = 
             // To go back up, take the node, do a shallow cloning, and replace the children.
             function(node, children) { 
-                console.log("closeF");
                 var newNode = node.cloneNode(false);
                 newNode.children = children;
                 return newNode; 
             };
-        console.log('dom: ', dom);
         return new TreePath(undefined,
                             dom,
                             [],
