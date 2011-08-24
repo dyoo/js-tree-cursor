@@ -148,7 +148,14 @@ var TreeCursor = (function() {
 
 
 
-
+    TreeCursor.adaptTreeCursor = function(node, openF, closeF) {
+        return new TreeCursor(undefined,
+                              node,
+                              [],
+                              [],
+                              openF,
+                              closeF);
+    };
 
 
     TreeCursor.arrayToCursor = function(anArray) {
@@ -166,12 +173,9 @@ var TreeCursor = (function() {
                 return n;
             }
         };
-        return new TreeCursor(undefined,
-                            anArray,
-                            [],
-                            [],
-                            arrayOpenF,
-                            arrayCloseF);
+        return TreeCursor.adaptTreeCursor(anArray,
+                                          arrayOpenF,
+                                          arrayCloseF);
     };
 
 
@@ -191,13 +195,11 @@ var TreeCursor = (function() {
                 }
                 return newNode; 
             };
-        return new TreeCursor(undefined,
-                            dom.cloneNode(true),
-                            [],
-                            [],
-                            domOpenF,
-                            domCloseF);
-    };
+        return TreeCursor.adaptTreeCursor(dom.cloneNode(true),
+                                          domOpenF,
+                                          domCloseF);
+    }
+
 
     return TreeCursor;
 }());

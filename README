@@ -12,7 +12,8 @@ Usage:
 
 You can create a cursor into the DOM with this:
 
-       var cursor = TreeCursor.domToCursor(document.body)
+    var cursor = TreeCursor.domToCursor(document.body)
+
 
 The cursor implements the following functions:
 
@@ -38,8 +39,41 @@ The cursor implements the following functions:
 along with predicates to make sure the motion is legal:
 
     cursor.canDown: -> boolean
+
     cursor.canUp: -> boolean
+
     cursor.canLeft: -> boolean
+
     cursor.canRight: -> boolean
+
     cursor.canSucc: -> boolean
+
     cursor.canPred: -> boolean
+
+
+and operations to make changes to the structure of the tree:
+
+    cursor.updateNode: (node -> node) -> cursor
+    Change the node at the cursor.
+
+
+
+FIXME: add the updating operations.  Otherwise, this is a silly module!
+
+
+
+
+----------------------------------------------------------------------
+
+
+Raw interface:
+
+TreeCursor.adaptTreeCursor: [node Node] 
+                            [openF (Node -> (arrayof Node))]
+                            [closeF (Node (arrayof Node) -> Node)] -> cursor
+
+Creates a cursor that can traverse the structure of the given node.
+
+openF and closeF are functions that teach the cursor how to sink and
+rise through the structure of a node.
+
