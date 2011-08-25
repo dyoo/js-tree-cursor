@@ -42,13 +42,23 @@ var TreeCursor = (function() {
                             this.closeF);
     };
 
+    TreeCursor.prototype.replaceNode = function(n) {
+        return new TreeCursor(this.parent,
+                              n,
+                              this.prevs,
+                              this.nexts,
+                              this.openF,
+                              this.closeF);
+    };
+
+
     TreeCursor.prototype.updateNode = function(f) {
         return new TreeCursor(this.parent,
-                            f(this.node),
-                            this.prevs,
-                            this.nexts,
-                            this.openF,
-                            this.closeF);
+                              f(this.node),
+                              this.prevs,
+                              this.nexts,
+                              this.openF,
+                              this.closeF);
     };
 
 
@@ -146,6 +156,12 @@ var TreeCursor = (function() {
         }
     };
 
+    TreeCursor.prototype.top = function() {
+        var n = this;
+        while (n.canUp()) { n = n.up(); }
+        return n;
+    };
+
 
 
     TreeCursor.adaptTreeCursor = function(node, openF, closeF) {
@@ -160,14 +176,14 @@ var TreeCursor = (function() {
 
     TreeCursor.arrayToCursor = function(anArray) {
         var arrayOpenF = function(n) { 
-            if (n.hasOwnProperty("length")) { 
+            if (n instanceof Array) { 
                 return n;
             } else {
                 return [];
             }
         };
         var arrayCloseF = function(n, children) { 
-            if (n.hasOwnProperty("length")) {
+            if (n instanceof Array) {
                 return children;
             } else {
                 return n;
