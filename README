@@ -42,6 +42,9 @@ The cursor implements the following functions:
     cursor.pred: -> cursor
     Move the cursor to the predecessor.
 
+    cursor.top: -> cursor
+    Move to the topmost node in the tree.
+
 
 along with predicates to make sure the motion is legal:
 
@@ -63,11 +66,20 @@ and operations to make changes to the structure of the tree:
     cursor.replaceNode: node -> cursor
     Change the node at the cursor.
 
+    cursor.insertDown: node -> cursor
+    Insert an element as the first child at focus.  Focus
+    moves to the inserted node.
 
+    cursor.insertRight: node -> cursor
+    Insert an element as the next sibling.  Focus moves to the inserted node.
 
-FIXME: add the other updating operations.  Otherwise, this is a silly module!
+    cursor.insertLeft: node -> cursor
+    Insert an element as the previous sibling.  Focus moves to the inserted node.
 
-
+    cursor.deleteNode: -> cursor
+    Delete the element at the current cursor.  Focus moves to the right
+    if possible.  If that's not possible, tries moving to the left.
+    Finally, moves up if neither are possible.
 
 
 ----------------------------------------------------------------------

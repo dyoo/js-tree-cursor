@@ -49,16 +49,6 @@ var TreeCursor = (function() {
                               this.atomicF);
     };
 
-    TreeCursor.prototype.replaceNode = function(n) {
-        return new TreeCursor(this.parent,
-                              n,
-                              this.prevs,
-                              this.nexts,
-                              this.openF,
-                              this.closeF,
-                              this.atomicF);
-    };
-
 
     TreeCursor.prototype.canUp = function() {
         return this.parent !== undefined;
@@ -162,6 +152,90 @@ var TreeCursor = (function() {
         while (n.canUp()) { n = n.up(); }
         return n;
     };
+
+
+    //////////////////////////////////////////////////////////////////////
+
+
+    TreeCursor.prototype.replaceNode = function(n) {
+        return new TreeCursor(this.parent,
+                              n,
+                              this.prevs,
+                              this.nexts,
+                              this.openF,
+                              this.closeF,
+                              this.atomicF);
+    };
+
+    TreeCursor.prototype.insertRight = function(n) {
+        return new TreeCursor(this.parent,
+                              n,
+                              this.prevs.concat(this.node),
+                              this.nexts,
+                              this.openF,
+                              this.closeF,
+                              this.atomicF);
+    };
+
+    TreeCursor.prototype.insertLeft = function(n) {
+        return new TreeCursor(this.parent,
+                              n,
+                              this.prevs,
+                              [this.node].concat(this.nexts),
+                              this.openF,
+                              this.closeF,
+                              this.atomicF);
+    };
+
+    TreeCursor.prototype.insertDown = function(n) {
+        if (this.atomicF(this.node)) {
+            throw new Error("down of atomic element");
+        }
+        return new TreeCursor(this,
+                              n,
+                              [],
+                              this.openF(this.node),
+                              this.openF,
+                              this.closeF,
+                              this.atomicF);
+    };
+
+    TreeCursor.prototype.deleteNode = function(n) {
+        var parent;
+        if (this.nexts.length !== 0) {
+            return new TreeCursor(this,
+                                  this.nexts[0],
+                                  this.prevs,
+                                  this.nexts.slice(1),
+                                  this.openF,
+                                  this.closeF,
+                                  this.atomicF);
+        } else if (this.prevs.length !== 0) {
+            return new TreeCursor(this,
+                                  this.prevs[this.prevs.length - 1],
+                                  this.prevs.slice(0, this.prevs.length - 1),
+                                  this.nexts,
+                                  this.openF,
+                                  this.closeF,
+                                  this.atomicF);
+        } else {
+            parent = this.parent;
+            return new TreeCursor(parent.parent,
+                                  this.closeF(parent.node, []),
+                                  parent.prevs,
+                                  parent.nexts,
+                                  this.openF,
+                                  this.closeF,
+                                  this.atomicF);
+        }
+    };
+
+
+
+
+
+
+    //////////////////////////////////////////////////////////////////////
 
 
 
