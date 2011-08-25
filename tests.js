@@ -121,5 +121,63 @@ describe('tests',
                      [[1, 2, [3, 4], [5, [[[6]]]], 7]]);
              },
 
+             'down and up with arrays': function() {
+                 var cursor = TreeCursor.arrayToCursor([[[1]]]);
+                 value_of(cursor.node).should_be([[[1]]]);
+                 value_of(cursor.down().node).should_be([[1]]);
+                 value_of(cursor.down().down().node).should_be([1]);
+                 value_of(cursor.down().down().down().node).should_be(1);
+                 value_of(cursor.down().down().down().up().node).should_be([1]);
+                 value_of(cursor.down().down().down().up().up().node).should_be([[1]]);
+                 value_of(cursor.down().down().down().up().up().up().node).should_be([[[1]]]);
+                 value_of(cursor.down().down().down().up().up().up().canUp()).should_be(false);
+             },
+
+             
+             'inserting down' : function() {
+                 var cursor = TreeCursor.arrayToCursor([]);
+                 cursor = cursor.insertDown(["hello"]);
+                 value_of(cursor.node).should_be(["hello"]);
+                 value_of(cursor.canUp()).should_be(true);
+                 value_of(cursor.up().node).should_be([["hello"]]);
+                 value_of(cursor.up().canUp()).should_be(false);
+             },
+
+
+             'inserting down several levels' : function() {
+                 var cursor = TreeCursor.arrayToCursor([]);
+                 cursor = cursor.insertDown(['hello']);
+                 cursor = cursor.insertDown(['world']);
+                 cursor = cursor.insertDown(['testing']);
+                 cursor = cursor.top();
+                 value_of(cursor.node).should_be([[[['testing'], 'world'], 'hello']]);
+             },
+
+
+             'inserting before': function() {
+                 var cursor = TreeCursor.arrayToCursor([]);
+                 cursor = cursor.insertDown("c").insertLeft("b").insertLeft("a").top();
+                 value_of(cursor.node).should_be(["a", "b", "c"]);
+             },
+
+
+             'inserting after': function() {
+                 var cursor = TreeCursor.arrayToCursor([]);
+                 cursor = cursor.insertDown("c").insertRight("b").insertRight("a").top();
+                 value_of(cursor.node).should_be(["c", "b", "a"]);
+             },
+
+
+             'deleting': function() {
+                 var cursor = TreeCursor.arrayToCursor([]);
+                 cursor = cursor.insertDown("c").insertRight("b").insertRight("a");
+                 value_of(cursor.left().node).should_be("b");
+                 cursor = cursor.left().deleteNode();
+                 value_of(cursor.top().node).should_be(["c", "a"]);
+
+                 value_of(cursor.node).should_be("a");
+             },
+
+
 
          });

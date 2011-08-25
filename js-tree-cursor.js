@@ -29,7 +29,8 @@ var TreeCursor = (function() {
     };
 
     TreeCursor.prototype.canDown = function() {
-        return !(this.atomicF(this.node));
+        return (!(this.atomicF(this.node)) &&
+                this.openF(this.node).length !== 0);
     };
 
     TreeCursor.prototype.down = function() {
