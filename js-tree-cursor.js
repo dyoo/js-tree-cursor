@@ -10,7 +10,7 @@
 var TreeCursor = (function() {
     "use strict";
 
-    var TreeCursor = function(parent, node, prevs, nexts, openF, closeF) {
+    var TreeCursor = function(parent, node, prevs, nexts, openF, closeF, atomicF) {
         this.parent = parent; // Parent can be the top (undefined), or a TreeCursor
         this.node = node;
         this.prevs = prevs;
@@ -22,24 +22,31 @@ var TreeCursor = (function() {
         // closeF: node (arrayof node) -> node
         // Given a node and its array of children, return a new node.
         this.closeF = closeF;
+
+        // atomicF: node -> boolean
+        // Produces true if the node should be treated atomically.
+        this.atomicF = atomicF;
     };
 
     TreeCursor.prototype.canDown = function() {
-        var opened = this.openF(this.node);
-        return (opened.length !== 0);
+        return !(this.atomicF(this.node));
     };
 
     TreeCursor.prototype.down = function() {
+        if (this.atomicF(this.node)) {
+            throw new Error("down of atomic element");
+        }
         var opened = this.openF(this.node);
         if (opened.length === 0) {
             throw new Error("down of empty");
         }
         return new TreeCursor(this, 
-                            opened[0],
-                            [],
-                            opened.slice(1),
-                            this.openF, 
-                            this.closeF);
+                              opened[0],
+                              [],
+                              opened.slice(1),
+                              this.openF, 
+                              this.closeF,
+                              this.atomicF);
     };
 
     TreeCursor.prototype.replaceNode = function(n) {
@@ -48,7 +55,8 @@ var TreeCursor = (function() {
                               this.prevs,
                               this.nexts,
                               this.openF,
-                              this.closeF);
+                              this.closeF,
+                              this.atomicF);
     };
 
 
@@ -59,12 +67,13 @@ var TreeCursor = (function() {
     TreeCursor.prototype.up = function() {
         var parent = this.parent;
         return new TreeCursor(parent.parent,
-                            this.closeF(parent.node,
-                                        this.prevs.concat([this.node]).concat(this.nexts)),
-                            parent.prevs,
-                            parent.nexts,
-                            this.openF,
-                            this.closeF);
+                              this.closeF(parent.node,
+                                          this.prevs.concat([this.node]).concat(this.nexts)),
+                              parent.prevs,
+                              parent.nexts,
+                              this.openF,
+                              this.closeF,
+                              this.atomicF);
     };
 
     TreeCursor.prototype.canLeft = function() { return this.prevs.length !== 0; };
@@ -72,11 +81,12 @@ var TreeCursor = (function() {
     TreeCursor.prototype.left = function() {
         if (this.prevs.length === 0) { throw new Error("left of first"); }
         return new TreeCursor(this.parent,
-                            this.prevs[this.prevs.length - 1],
-                            this.prevs.slice(0, this.prevs.length - 1),
-                            [this.node].concat(this.nexts),
-                            this.openF,
-                            this.closeF);
+                              this.prevs[this.prevs.length - 1],
+                              this.prevs.slice(0, this.prevs.length - 1),
+                              [this.node].concat(this.nexts),
+                              this.openF,
+                              this.closeF,
+                              this.atomicF);
     };
 
     TreeCursor.prototype.canRight = function() { return this.nexts.length !== 0; };
@@ -84,11 +94,12 @@ var TreeCursor = (function() {
     TreeCursor.prototype.right = function() {
         if (this.nexts.length === 0) { throw new Error("right of last"); }
         return new TreeCursor(this.parent,
-                            this.nexts[0],
-                            this.prevs.concat([this.node]),
-                            this.nexts.slice(1),
-                            this.openF, 
-                            this.closeF);
+                              this.nexts[0],
+                              this.prevs.concat([this.node]),
+                              this.nexts.slice(1),
+                              this.openF, 
+                              this.closeF,
+                              this.atomicF);
     };
     
     TreeCursor.prototype.succ = function() {
@@ -154,13 +165,14 @@ var TreeCursor = (function() {
 
 
 
-    TreeCursor.adaptTreeCursor = function(node, openF, closeF) {
+    TreeCursor.adaptTreeCursor = function(node, openF, closeF, atomicF) {
         return new TreeCursor(undefined,
                               node,
                               [],
                               [],
                               openF,
-                              closeF);
+                              closeF,
+                              atomicF);
     };
 
 
@@ -179,9 +191,14 @@ var TreeCursor = (function() {
                 return n;
             }
         };
+
+        var arrayAtomicF = function(n) {
+            return !(n instanceof Array);
+        };
         return TreeCursor.adaptTreeCursor(anArray,
                                           arrayOpenF,
-                                          arrayCloseF);
+                                          arrayCloseF,
+                                          arrayAtomicF);
     };
 
 
@@ -201,9 +218,14 @@ var TreeCursor = (function() {
                 }
                 return newNode; 
             };
+        var domAtomicF =
+            function(node) {
+                return node.nodeType !== 1;
+            };
         return TreeCursor.adaptTreeCursor(dom.cloneNode(true),
                                           domOpenF,
-                                          domCloseF);
+                                          domCloseF,
+                                          domAtomicF);
     }
 
 

@@ -77,16 +77,22 @@ Raw interface:
 
 TreeCursor.adaptTreeCursor: [node Node] 
                             [openF (Node -> (arrayof Node))]
-                            [closeF (Node (arrayof Node) -> Node)] -> cursor
+                            [closeF (Node (arrayof Node) -> Node)]
+                            [atomicF (Node -> boolean)]
+                            -> cursor
 
 Creates a cursor that can traverse the structure of the given node.
 
 openF and closeF are functions that teach the cursor how to sink and
 rise through the structure of a node.
 
+atomicF tell TreeCursor if the node should be considered one that can
+be dived into.
+
 As an example, the TreeCursor implementation has a function
 TreeCursor.arrayToCursor to walk deeply nested JavaScript structures,
-with arrays.  It does not dive into objects, though.
+with arrays.  It only dives into arrays, and all other values are treated
+atomically.
 
 
 ----------------------------------------------------------------------
