@@ -16,6 +16,12 @@ You can create a cursor into the DOM with this:
     var cursor = TreeCursor.domToCursor(document.body)
 
 
+The node at the cursor can be found with:
+
+    cursor.node: node
+    The node that's currently being focused.
+
+
 The cursor implements the following functions:
 
     cursor.down: -> cursor
@@ -54,12 +60,12 @@ along with predicates to make sure the motion is legal:
 
 and operations to make changes to the structure of the tree:
 
-    cursor.updateNode: (node -> node) -> cursor
+    cursor.replaceNode: node -> cursor
     Change the node at the cursor.
 
 
 
-FIXME: add the updating operations.  Otherwise, this is a silly module!
+FIXME: add the other updating operations.  Otherwise, this is a silly module!
 
 
 

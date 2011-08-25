@@ -86,12 +86,12 @@ describe('tests',
              },
 
 
-             'updating' : function() {
+             'replacing' : function() {
                  var map = ["zero", "one", "two", "three", "four", "five", "six", "seven"];
                  var cursor = TreeCursor.arrayToCursor([[1, 2, [3, 4], [5, [[[6]]]], 7]]);
                  while (true) {
                      if (typeof(cursor.node) === 'number') {
-                         cursor = cursor.updateNode(function(n) { return map[n]; });
+                         cursor = cursor.replaceNode(map[cursor.node]);
                      }
                      if (cursor.canSucc()) { 
                          cursor = cursor.succ();
@@ -103,15 +103,13 @@ describe('tests',
                      [["one", "two", ["three", "four"], ["five", [[["six"]]]], "seven"]]);
              },
 
-
-
-             'making sure the update is functional' : function() {
+             'making sure the replacement is functional' : function() {
                  var map = ["zero", "one", "two", "three", "four", "five", "six", "seven"];
                  var cursor = TreeCursor.arrayToCursor([[1, 2, [3, 4], [5, [[[6]]]], 7]]);
                  while (true) {
                      if (typeof(cursor.node) === 'number') {
                          // Here, we don't save the cursor, hence nothing should happen!
-                         cursor.updateNode(function(n) { return map[n]; });
+                         cursor.replaceNode(map[cursor.node]);
                      }
                      if (cursor.canSucc()) { 
                          cursor = cursor.succ();
@@ -121,7 +119,7 @@ describe('tests',
                  }
                  value_of(cursor.top().node).should_be(
                      [[1, 2, [3, 4], [5, [[[6]]]], 7]]);
-             }
+             },
 
 
          });

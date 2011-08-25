@@ -52,16 +52,6 @@ var TreeCursor = (function() {
     };
 
 
-    TreeCursor.prototype.updateNode = function(f) {
-        return new TreeCursor(this.parent,
-                              f(this.node),
-                              this.prevs,
-                              this.nexts,
-                              this.openF,
-                              this.closeF);
-    };
-
-
     TreeCursor.prototype.canUp = function() {
         return this.parent !== undefined;
     };
