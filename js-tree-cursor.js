@@ -204,7 +204,7 @@ var TreeCursor = (function() {
     TreeCursor.prototype.deleteNode = function(n) {
         var parent;
         if (this.nexts.length !== 0) {
-            return new TreeCursor(this,
+            return new TreeCursor(this.parent,
                                   this.nexts[0],
                                   this.prevs,
                                   this.nexts.slice(1),
@@ -212,7 +212,7 @@ var TreeCursor = (function() {
                                   this.closeF,
                                   this.atomicF);
         } else if (this.prevs.length !== 0) {
-            return new TreeCursor(this,
+            return new TreeCursor(this.parent,
                                   this.prevs[this.prevs.length - 1],
                                   this.prevs.slice(0, this.prevs.length - 1),
                                   this.nexts,

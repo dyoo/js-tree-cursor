@@ -173,9 +173,17 @@ describe('tests',
                  cursor = cursor.insertDown("c").insertRight("b").insertRight("a");
                  value_of(cursor.left().node).should_be("b");
                  cursor = cursor.left().deleteNode();
+                 value_of(cursor.node).should_be("a");
+                 value_of(cursor.up().node).should_be(["c", "a"]);
                  value_of(cursor.top().node).should_be(["c", "a"]);
 
-                 value_of(cursor.node).should_be("a");
+                 cursor = cursor.deleteNode();
+                 value_of(cursor.node).should_be("c");
+                 value_of(cursor.top().node).should_be(["c"]);
+
+                 cursor = cursor.deleteNode(); 
+                 value_of(cursor.node).should_be([]);
+                 value_of(cursor.canUp()).should_be(false);
              },
 
 
