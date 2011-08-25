@@ -11,15 +11,26 @@ http://en.wikipedia.org/wiki/Zipper_(data_structure)
 
 Usage:
 
+
+
 You can create a cursor into the DOM with this:
 
     var cursor = TreeCursor.domToCursor(document.body)
+
+or a cursor into a tree whose structure uses nested arrays, with this:
+
+    var cursor = TreeCursor.arrayToCursor([['this'], 'is', 'a', [['test']]])
+
+TreeCursor provides a raw interface to adapt an arbitrary tree
+structure to a cursor, described at the end of this document.
+
 
 
 The node at the cursor can be found with:
 
     cursor.node: node
     The node that's currently being focused.
+
 
 
 The cursor implements the following functions:
@@ -40,25 +51,35 @@ The cursor implements the following functions:
     Move the cursor to the successor.
 
     cursor.pred: -> cursor
-    Move the cursor to the predecessor.
+    Move the cursor to the predecessor. 
 
     cursor.top: -> cursor
-    Move to the topmost node in the tree.
+    Jump to the topmost node in the tree.
 
 
-along with predicates to make sure the motion is legal:
+succ() and pred() are defined in terms of preorder traversal.
+
+
+
+The cursor also provides predicates to make sure the motion is legal:
 
     cursor.canDown: -> boolean
+    Returns true if the node is non-atomic and has children.
 
     cursor.canUp: -> boolean
+    Returns true if the node has a parent.
 
     cursor.canLeft: -> boolean
+    Returns true if the node has a previous sibling.
 
     cursor.canRight: -> boolean
+    Returns true if the node as a next sibling.
 
     cursor.canSucc: -> boolean
+    Returns true if the node has a successor.
 
     cursor.canPred: -> boolean
+    Returns true if the node has a predecessor.
 
 
 and operations to make changes to the structure of the tree:
@@ -78,8 +99,8 @@ and operations to make changes to the structure of the tree:
 
     cursor.deleteNode: -> cursor
     Delete the element at the current cursor.  Focus moves to the right
-    if possible.  If that's not possible, tries moving to the left.
-    Finally, moves up if neither are possible.
+    if possible.  If that's not possible, tries focusing to the left.
+    Otherwise, moves up when neither are possible.
 
 
 ----------------------------------------------------------------------
