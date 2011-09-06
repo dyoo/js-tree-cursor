@@ -1,4 +1,59 @@
-// FILL ME IN
+
+// domNodeToArrayTree: dom -> dom-tree
+// Given a native dom node, produces the appropriate array tree representation
+var domNodeToArrayTree = function(domNode) {
+    var result = [domNode];
+    var c;
+    for (c = domNode.firstChild; c !== null; c = c.nextSibling) {
+	result.push(domNodeToArrayTree(c));
+    }
+    return result;
+};
+
+
+var arrayTreeToDomNode = function(tree) {
+    var result = tree[0].cloneNode(true);
+    var i;
+    for (i = 1; i < tree.length; i++) {
+        result.appendChild(arrayTreeToDomNode(tree[i]));
+    }
+    return result;
+};
+
+
+var domToArrayTreeCursor = function(dom) {
+    var domOpenF = 
+        // To go down, just take the children.
+        function(tree) { 
+            return tree.slice(1);
+        };
+    var domCloseF = 
+        // To go back up, take the tree and reconstruct it.
+        function(tree, children) { 
+            return [tree[0]].concat(children);
+        };
+    var domAtomicF =
+        function(tree) {
+            return tree[0].nodeType !== 1;
+        };
+    return TreeCursor.adaptTreeCursor(domNode_to_tree(dom.cloneNode(true)),
+                                      domOpenF,
+                                      domCloseF,
+                                      domAtomicF);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 describe('tests',
          {
@@ -188,4 +243,126 @@ describe('tests',
 
 
 
+         });
+
+
+
+
+
+
+
+
+
+
+
+
+
+// domNodeToArrayTree: dom -> dom-tree
+// Given a native dom node, produces the appropriate array tree representation
+var domNodeToArrayTree = function(domNode) {
+    var result = [domNode];
+    var c;
+    for (c = domNode.firstChild; c !== null; c = c.nextSibling) {
+	result.push(domNodeToArrayTree(c));
+    }
+    return result;
+};
+
+
+var arrayTreeToDomNode = function(tree) {
+    var result = tree[0].cloneNode(true);
+    var i;
+    for (i = 1; i < tree.length; i++) {
+        result.appendChild(arrayTreeToDomNode(tree[i]));
+    }
+    return result;
+};
+
+
+var domToArrayTreeCursor = function(dom) {
+    var domOpenF = 
+        // To go down, just take the children.
+        function(tree) { 
+            return tree.slice(1);
+        };
+    var domCloseF = 
+        // To go back up, take the tree and reconstruct it.
+        function(tree, children) { 
+            return [tree[0]].concat(children);
+        };
+    var domAtomicF =
+        function(tree) {
+            return tree[0].nodeType !== 1;
+        };
+    return TreeCursor.adaptTreeCursor(domNodeToArrayTree(dom.cloneNode(true)),
+                                      domOpenF,
+                                      domCloseF,
+                                      domAtomicF);
+};
+
+var treeText = function(tree) {
+    var text = [];
+    var visit = function(tree) {
+        var i;
+        if (tree[0].nodeType === 3) {
+            text.push(tree[0].nodeValue);
+        }
+        for (i = 1; i < tree.length; i++) {
+            visit(tree[i]);
+        }
+    };
+    visit(tree);
+    return text.join('');
+};
+
+
+
+describe('more tests',
+         { 
+             'simple test' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div>Hello world</div>').get(0));
+                 value_of(aCursor.node[0].nodeName).should_be("DIV");
+             },
+             
+             'going down' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div><ul><li>item one</li><li>item two</li></ul></div>').get(0));
+                 value_of(aCursor.down().node[0].nodeName).should_be("UL");
+             },
+
+             'going down 2' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div><ul><li>item one</li><li>item two</li></ul></div>').get(0));
+                 value_of(aCursor.down().down().node[0].nodeName).should_be("LI");
+             },
+
+             'going up' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div><ul><li>item one</li><li>item two</li></ul></div>').get(0));
+                 value_of(aCursor.down().down().up().node[0].nodeName).should_be("UL");
+             },
+
+             'going up 2 ' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div><ul><li>item one</li><li>item two</li></ul></div>').get(0));
+                 value_of(aCursor.down().down().up().up().node[0].nodeName).should_be("DIV");
+             },
+
+
+             'going right' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div><span>hi</span><span>world</span></div>').get(0));
+                 value_of(treeText(aCursor.down().node)).should_be("hi");
+                 value_of(treeText(aCursor.down().right().node)).should_be("world");
+             },
+
+             'going right and left' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div><span>hi</span><span>world</span></div>').get(0));
+                 value_of(treeText(aCursor.down().right().left().node)).should_be("hi");
+             },
+
+             'going right and up' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div><span>hi</span><span>world</span></div>').get(0));
+                 value_of(aCursor.down().right().up().node[0].nodeName).should_be("DIV");
+             },
+
+             'going right and up and down' : function() {
+                 var aCursor = domToArrayTreeCursor($('<div><span>hi</span><span>world</span></div>').get(0));
+                 value_of(treeText(aCursor.down().right().up().down().node)).should_be("hi");
+             }
          });
